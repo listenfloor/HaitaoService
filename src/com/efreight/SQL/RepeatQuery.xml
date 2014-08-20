@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="RepeatQuery">
+	<select id="gettimingsettingseq" resultClass="java.lang.Integer">
+		select SEQ_TIMINGFUNCSETTINGS.NEXTVAL from dual
+	</select>
+	<select id="gettimingqueueseq"  resultClass="java.lang.Integer">
+		select SEQ_TIMINGFUNCQUEUE.NEXTVAL from dual
+	</select>
+	<insert id="inserttimingfuncsetting" parameterClass="hashmap">
+		INSERT INTO TIMINGFUNCSETTINGS VALUES(#settingid#,#type#,#key#,SYSDATE,#weekdays#,#intervalminutes#,to_date(#lastoperationdate#,'yyyy-mm-dd hh24:mi:ss'),'NO',#userid#,#repeattimes#)
+	</insert>
+	<update id="updatetimingfuncsetting" parameterClass="hashmap">
+		update timingfuncsettings set id=id
+		<isNotEmpty prepend="," property="weekdays">
+				weekdays=#weekdays#
+        </isNotEmpty>
+        <isNotEmpty prepend="," property="intervalminutes">
+        	intervalminutes=#intervalminutes#
+        </isNotEmpty>
+        <isNotEmpty prepend="," property="repeattimes">
+        	repeattimes=#repeattimes#
+        </isNotEmpty>
+		where operationtype=#type# and operationkey=#key# and userid=#userid#
+	</update>
+	<select id="gettimingfuncsetting" parameterClass="hashmap" resultClass="hashmap">
+		select * from timingfuncsettings where operationkey=#key# and userid=#userid# and isexpired='NO'
+	</select>
+	
+	<select id="gettimingfuncsettingbyid" parameterClass="java.math.BigDecimal" resultClass="hashmap">
+		select * from timingfuncsettings where id=#value# and (repeattimes &gt; 0 or repeattimes = -1) and isexpired='NO'
+	</select>
+	
+	<update id="updatelastoperationdate" parameterClass="java.math.BigDecimal">
+		UPDATE timingfuncsettings
+		SET lastoperationdate=sysdate,
+		  repeattimes        =
+		  CASE
+		    WHEN repeattimes > 0
+		    THEN repeattimes-1
+		    ELSE repeattimes
+		  END
+		WHERE id=#value#
+	</update>
+	<update id="setsettingexpired" parameterClass="hashmap">
+		update timingfuncsettings set ISEXPIRED='YES' where operationtype=#type# and operationkey=#key# and userid=#userid#
+	</update>
+	
+	<insert id="inserttimingfuncqueue" parameterClass="hashmap">
+		INSERT INTO TIMINGFUNCQUEUE VALUES(#queueid#,#nextoperationdate#,#type#,#key#,SYSDATE,'NO',#userid#,#settingid#)
+	</insert>
+	<delete id="removetimingfuncqueue" parameterClass="hashmap">
+		delete from TIMINGFUNCQUEUE where settingid=#settingid# and issent &lt;&gt; 'YES'
+	</delete>
+	<delete id="removetimingfuncqueuebykey" parameterClass="hashmap">
+		delete from TIMINGFUNCQUEUE where operationtype=#type# and operationkey=#key# and userid=#userid# and issent &lt;&gt; 'YES'
+	</delete>
+	<update id="updatetimingfuncqueue" parameterClass="java.math.BigDecimal">
+		update TIMINGFUNCQUEUE set issent='YES' where settingid=#value# and issent &lt;&gt; 'YES'
+	</update>
+	<select id="gettimingfuncqueue" parameterClass="hashmap" resultClass="hashmap">
+		select * from TIMINGFUNCQUEUE where operationtype=#type# and operationkey=#key# and userid=#userid#
+	</select>
+	<select id="getqueuelist" resultClass="hashmap" parameterClass="java.util.Date">
+		select * from timingfuncqueue where issent='NO' and datetime &lt; #value#
+	</select>
+</sqlMap>

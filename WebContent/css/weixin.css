@@ -1,0 +1,14 @@
+@CHARSET "UTF-8";
+
+#content{
+    position: absolute;
+    top: 50px;
+    left: 10%;
+    border-radius: 2px;
+}
+#date{
+    position: absolute;
+    top:0px;
+    left: 10%;
+    border-radius: 2px;
+}

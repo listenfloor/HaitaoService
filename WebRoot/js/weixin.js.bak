@@ -1,0 +1,20 @@
+function onLoad(){
+	var json=[
+{ "openid":"omQjGji2ryvc9pFo2TRWT5RCoU9M", "wxid":"weiweiluke", "wxfakeid":"3660475","nickname":"´óÂÜ²·",  "datetime":"2013-04-09 11:30", "optype":"unsubscribe", "subscribedate":"2013-04-04 10:10", "unsubscribedate":"2013-04-09 11:30" },
+{ "openid":"omQjGji2ryvc9pFo2TRWT5RCoU9M", "wxid":"weiweiluke", "wxfakeid":"3660475","nickname":"´óÂÜ²·", "datetime":"2013-04-09 11:30", "optype":"unsubscribe", "subscribedate":"2013-04-04 10:10", "unsubscribedate":"2013-04-09 11:30" },
+{ "openid":"omQjGji2ryvc9pFo2TRWT5RCoU9M", "wxid":"weiweiluke", "wxfakeid":"3660475", "nickname":"´óÂÜ²·", "datetime":"2013-04-09 11:30", "optype":"unsubscribe", "subscribedate":"2013-04-04 10:10", "unsubscribedate":"2013-04-09 11:30" }
+];
+	
+	alert("aaaaaaa");
+	alert(json[0].openid);
+    $("#data1").html("<td>"+json[0].openid+"</td>"+"<td>"+json[0].wxid+"</td>"+"<td>"+json[0].wxfakeid+"</td>"
+		 +"<td>"+json[0].nickname+"</td>"+"<td>"+json[0].datetime+"</td>"+"<td>"+json[0].optype+"</td>"
+		 +"<td>"+json[0].subscribedate+"</td>"+"<td>"+json[0].unsubscribedate+"</td>");
+	$("#data2").html("<td>"+json[1].openid+"</td>"+"<td>"+json[1].wxid+"</td>"+"<td>"+json[1].wxfakeid+"</td>"
+			 +"<td>"+json[1].nickname+"</td>"+"<td>"+json[1].datetime+"</td>"+"<td>"+json[1].optype+"</td>"
+			 +"<td>"+json[1].subscribedate+"</td>"+"<td>"+json[1].unsubscribedate+"</td>");
+	$("#data3").html("<td>"+json[2].openid+"</td>"+"<td>"+json[2].wxid+"</td>"+"<td>"+json[2].wxfakeid+"</td>"
+			 +"<td>"+json[2].nickname+"</td>"+"<td>"+json[2].datetime+"</td>"+"<td>"+json[2].optype+"</td>"
+			 +"<td>"+json[2].subscribedate+"</td>"+"<td>"+json[2].unsubscribedate+"</td>");
+	
+}

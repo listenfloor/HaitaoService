@@ -1,0 +1,33 @@
+@CHARSET "UTF-8";
+#login-form{
+    position: absolute;
+    top: 20%;
+    left: 30%;
+    width: 400px;
+    height: 250px;
+    z-index: 9;
+    border: 1px red solid;
+    border-radius: 2px;
+    background-color: white;
+}
+#blog{
+	position: absolute;
+	top:50%;
+	
+}
+.hidden{
+display: none;
+}
+body{
+    z-index: 1;
+}
+.lowlight{
+    background-color: #dcdcdc;
+}
+.highlight{
+    background-color: white;
+}
+
+.fabu{
+	display: none;
+}

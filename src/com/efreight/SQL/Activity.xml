@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="Activity">	
+	<insert id="insertcandy" parameterClass="hashmap">
+		INSERT INTO CANDY VALUES(SEQ_CANDY.NEXTVAL,#openid#,#awbcode#,SYSDATE)
+	</insert>
+	<select id="isawbexist" parameterClass="hashmap" resultClass="java.lang.String">
+		SELECT awbcode FROM CANDY WHERE OPENID=#openid# and AWBCODE=#awbcode# and rownum=1
+	</select>
+	<select id="getcandy" parameterClass="hashmap" resultClass="hashmap">
+		SELECT *
+		FROM
+		  (SELECT CANDY.OPENID,
+		    WXUSERINFO.NICKNAME,
+		    CANDY.CANDYCOUNT
+		  FROM
+		    (SELECT openid,
+		      COUNT(awbcode) AS candycount
+		    FROM
+		      (SELECT openid,
+		        awbcode
+		      FROM candy
+		      WHERE DATETIME BETWEEN to_date('2013-10-31 00:00:00','yyyy-mm-dd hh24:mi:ss') AND to_date('2013-10-31 23:59:59','yyyy-mm-dd hh24:mi:ss')
+		      GROUP BY openid,
+		        awbcode
+		      )
+		    GROUP BY openid
+		    ORDER BY candycount DESC
+		    ) CANDY,
+		    WXUSERINFO
+		  WHERE WXUSERINFO.FAKEID =CANDY.OPENID
+		  AND WXUSERINFO.ISSTAFF IS NULL
+		  )
+		ORDER BY CANDYCOUNT DESC
+	</select>
+	
+	<select id="getcandyforapp" parameterClass="hashmap" resultClass="hashmap">
+		SELECT *
+		FROM
+		  (SELECT openid,
+		    candycount,
+		    rownum AS position
+		  FROM
+		    (SELECT openid,
+		      COUNT(awbcode) AS candycount
+		    FROM
+		      (SELECT openid,
+		        awbcode
+		      FROM candy
+		      WHERE DATETIME BETWEEN to_date('2013-10-31 00:00:00','yyyy-mm-dd hh24:mi:ss') AND to_date('2013-10-31 23:59:59','yyyy-mm-dd hh24:mi:ss')
+		      GROUP BY openid,
+		        awbcode
+		      )
+		    GROUP BY openid
+		    ORDER BY candycount DESC
+		    )
+		  )
+			<isNotEmpty prepend="where" property="openid">
+				OPENID = #openid#
+        	</isNotEmpty>
+	</select>
+	<select id="getcount"  resultClass="java.lang.Integer">
+		SELECT COUNT(*)
+		FROM
+		  (SELECT candy.openid,
+		    candy.awbcode
+		  FROM
+		    (SELECT openid,
+		      awbcode
+		    FROM candy
+		    WHERE DATETIME BETWEEN to_date('2013-10-31 00:00:00','yyyy-mm-dd hh24:mi:ss') AND to_date('2013-10-31 23:59:59','yyyy-mm-dd hh24:mi:ss')
+		    GROUP BY openid,
+		      awbcode
+		    ) candy,
+		    wxuserinfo
+		  WHERE candy.openid      = wxuserinfo.fakeid
+		  AND wxuserinfo.isstaff IS NULL
+		  UNION ALL
+		  SELECT openid,
+		    awbcode
+		  FROM candy
+		  WHERE DATETIME BETWEEN to_date('2013-10-31 00:00:00','yyyy-mm-dd hh24:mi:ss') AND to_date('2013-10-31 23:59:59','yyyy-mm-dd hh24:mi:ss')
+		  GROUP BY openid,
+		    awbcode
+		  HAVING LENGTH(openid)>10
+		  ) 
+	</select>
+</sqlMap>

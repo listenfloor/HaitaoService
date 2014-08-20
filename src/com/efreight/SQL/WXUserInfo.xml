@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+ PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN"
+ "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="Person">
+ <!-- Use primitive wrapper type (e.g. Integer) as parameter and allow results to
+ be auto-mapped results to Person object (Java Bean) properties -->
+ <select id="getUserById" parameterClass="int" resultClass="com.efreight.SQL.WXUserInfo">
+  SELECT ENTITY_SYSCODE as entity_sysCode,
+  FAKEID as fakeId,
+  NICKNAME as nickName,
+  WXID as wxId,
+  
+  OPENID as openId,
+  USERSTATUS as userStatus,
+  SUBSCRIBEDATE as subScribeDate,
+  UNSUBSCRIBEDATE as unSubScribeDate
+  FROM WXUSERINFO
+  WHERE ENTITY_SYSCODE = #entity_sysCode#
+ </select>
+
+</sqlMap>

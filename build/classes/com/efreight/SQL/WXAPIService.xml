@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="WXAPIService">
+	<!-- 用户相关表操作 -->
+	<select id="loginemployee" parameterClass="hashmap" resultClass="com.efreight.SQL.Employee">
+		select empId,username,password,empName from employee where username=#username# and password=#password#
+	</select>
+	<insert id="insertemployee" parameterClass="hashmap">
+		insert into employee (EMPID,USERNAME,PASSWORD,EMPNAME) values (seq_employee.nextval,#username#,#password#,#empName#)
+	</insert>
+	<!-- 用户相关表操作 end -->
+	<select id="loadwxuserinfo" parameterClass="hashmap" resultClass="com.efreight.weixin.WXUserinfo">
+		select fakeid,nickname,wxid,openid,email,country,province,city,language,headimg,lastupdate,userstatus from wxuserinfo where userstatus='subscribe'
+	</select>
+	<select id="getwxuserinfobyopenid" parameterClass="java.lang.String" resultClass="com.efreight.weixin.WXUserinfo">
+		select fakeid,nickname,wxid,openid,email,country,province,city,language,headimg,lastupdate,userstatus from wxuserinfo where openid=#value#
+	</select>
+	<select id="getwxuserinfobyfakeid" parameterClass="java.lang.String" resultClass="com.efreight.weixin.WXUserinfo">
+		select fakeid,nickname,wxid,openid,email,country,province,city,language,headimg,lastupdate,userstatus from wxuserinfo where fakeid=#value#
+	</select>
+	
+	<select id="loadwxgroupinfo" parameterClass="hashmap" resultClass="hashmap">
+		select groupid,grouplastfakeid from wxgroupinfo
+	</select>
+	<update id="updategroupinfo" parameterClass="hashmap">
+		update wxgroupinfo set grouplastfakeid=#lastfakeid# where groupid=#groupid#
+	</update>
+	<!-- -->
+	<insert id="insertuserinfo" parameterClass="hashmap">
+		insert into wxuserinfo (FAKEID,NICKNAME,WXID,CREATEDATE,OPENID,COUNTRY,PROVINCE,CITY,language,headimg,lastupdate,userstatus) values (#FAKEID#,#NICKNAME#,#WXID#,to_date(#CREATEDATE#,'yyyy-mm-dd hh24:mi:ss'),#OPENID#,#COUNTRY#,#PROVINCE#,#CITY#,#LANGUAGE#,#HEADIMG#,to_date(#LASTUPDATE#,'yyyy-mm-dd hh24:mi:ss'),#USERSTATUS#)
+	</insert>
+	<insert id="insertgroupinfo" parameterClass="hashmap">
+		insert into wxgroupinfo (grouplastfakeid,groupid) values (#lastfakeid#,#groupid#)
+	</insert>
+	<insert id="insertsubscribelog" parameterClass="hashmap">
+		insert into subscribelog (logid,openid,wxid,wxfakeid,nickname,datetime,optype,source,key) 
+		values 
+		(SEQ_WXSUBSCRIBE.nextval,#openid#,#wxid#,#wxfakeid#,#nickname#,to_date(#datetime#,'yyyy-mm-dd hh24:mi:ss'),#optype#,#source#,#key#)
+	</insert>
+	<insert id="insertmessagelog" parameterClass="hashmap">
+		insert into MESSAGELOG (messageid,datetime,sender,receiver,messagetype,content,success,wxmsgid,msgtype,issend,msgresult) values
+	    (seq_wxmessage.nextval,to_date(#datetime#,'yyyy-mm-dd hh24:mi:ss'),#sender#,#receiver#,#messagetype#,#content#,#success#,#wxMsgId#,#msgType#,#issend#,#msgresult#)
+	</insert>
+	
+	<select id="loadmessagelogbywxmsgid" parameterClass="String" resultClass="String">
+		select datetime from MESSAGELOG where WXMSGID=#WXMSGID# and ISSEND='0' order by datetime
+	</select>
+	
+
+	<update id="updateuserstatus" parameterClass="java.lang.String">
+		update wxuserinfo set wxuserstatus='unsubscribe' where openid=#value#
+	</update>
+	<update id="updateuserinfo" parameterClass="hashmap">
+		update wxuserinfo
+		<dynamic prepend="set">
+			<isNotEmpty prepend="," property="userstatus"><![CDATA[ userstatus = #userstatus#]]></isNotEmpty>
+			<isNotEmpty prepend="," property="subscribedate"><![CDATA[ subscribedate = to_date(#subscribedate#,'yyyy-mm-dd hh24:mi:ss')]]></isNotEmpty>
+			<isNotEmpty prepend="," property="unsubscribedate"><![CDATA[ unsubscribedate = to_date(#unsubscribedate#,'yyyy-mm-dd hh24:mi:ss')]]></isNotEmpty>
+			<isNotEmpty prepend="," property="NICKNAME"><![CDATA[ NICKNAME = #NICKNAME#]]></isNotEmpty>
+			<isNotEmpty prepend="," property="WXID"><![CDATA[ WXID = #WXID#]]></isNotEmpty>
+			<isNotEmpty prepend="," property="OPENID"><![CDATA[ OPENID = #OPENID#]]></isNotEmpty>
+			<isNotEmpty prepend="," property="LANGUAGE"><![CDATA[ LANGUAGE = #LANGUAGE#]]></isNotEmpty>
+			<isNotEmpty prepend="," property="HEADIMG"><![CDATA[ HEADIMG = #HEADIMG#]]></isNotEmpty>
+			<isNotEmpty prepend="," property="LASTUPDATE"><![CDATA[ LASTUPDATE = to_date(#LASTUPDATE#,'yyyy-mm-dd hh24:mi:ss')]]></isNotEmpty>
+		</dynamic>
+		where fakeid=#FAKEID#
+	</update>
+	<!-- -->
+	<update id="updateuserinfobyfakeid" parameterClass="hashmap">
+		update wxuserinfo
+		<dynamic prepend="set">
+			<isNotEmpty prepend="," property="NICKNAME"><![CDATA[ NICKNAME = #NICKNAME#]]></isNotEmpty>
+			<isNotEmpty prepend="," property="WXID"><![CDATA[ WXID = #WXID#]]></isNotEmpty>
+			<isNotEmpty prepend="," property="OPENID"><![CDATA[ OPENID = #OPENID#]]></isNotEmpty>
+			<isNotEmpty prepend="," property="COUNTRY"><![CDATA[ COUNTRY = #COUNTRY#]]></isNotEmpty>
+			<isNotEmpty prepend="," property="PROVINCE"><![CDATA[ PROVINCE = #PROVINCE#]]></isNotEmpty>
+			<isNotEmpty prepend="," property="CITY"><![CDATA[ CITY = #CITY#]]></isNotEmpty>
+			<isNotEmpty prepend="," property="LANGUAGE"><![CDATA[ LANGUAGE = #LANGUAGE#]]></isNotEmpty>
+			<isNotEmpty prepend="," property="HEADIMG"><![CDATA[ HEADIMG = #HEADIMG#]]></isNotEmpty>
+			<isNotEmpty prepend="," property="LASTUPDATE"><![CDATA[ LASTUPDATE = to_date(#LASTUPDATE#,'yyyy-mm-dd hh24:mi:ss')]]></isNotEmpty>
+			<isNotEmpty prepend="," property="USERSTATUS"><![CDATA[ USERSTATUS = #USERSTATUS#]]></isNotEmpty>
+		</dynamic>
+		where fakeid=#FAKEID#
+	</update> 
+	<!-- 报表 -->
+	<select id="subscribelogbydate" resultClass="hashmap" parameterClass="hashmap">
+         select s.openid,i.wxid,i.fakeid,i.nickname,to_char(s.datetime,'yyyy-mm-dd hh24:mi:ss') as opdate,s.optype,s.subscribedate,s.unsubscribedate,s.key from subscribelog s left join wxuserinfo i on s.OPENID=i.OPENID
+         where 1=1 
+            <isNotEmpty prepend="and" property="startdate">
+				s.datetime >= to_date(#startdate#,'yyyy-mm-dd hh24:mi:ss')
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="enddate">
+				s.datetime &lt;= to_date(#enddate#,'yyyy-mm-dd hh24:mi:ss')
+            </isNotEmpty>
+             order by s.datetime desc
+    </select>
+    
+    <select id="loadmessagelog" resultClass="hashmap" parameterClass="hashmap">
+         select m.messageid , to_char(m.datetime,'yyyy-mm-dd hh24:mi:ss') as datetime,s.fakeid as sender ,r.fakeid as receiver,m.messagetype,m.content,m.success,m.wxmsgid,m.msgtype,m.msgresult,m.issend,m0.messagecount from MESSAGELOG m 
+         left join (select m1.WXMSGID,count(m1.WXMSGID) messagecount , min(m1.DATETIME) DATETIME from MESSAGELOG m1 where m1.WXMSGID is NOT null GROUP BY m1.WXMSGID) m0 on m.WXMSGID=m0.WXMSGID
+         left join wxuserinfo s on m.sender = s.OPENID left join wxuserinfo r on m.receiver = r.openid
+         where 1=1 
+            <isNotEmpty prepend="and" property="startdate">
+				m.datetime >=to_date(#startdate#,'yyyy-mm-dd hh24:mi:ss')
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="enddate">
+				m.datetime &lt;= to_date(#enddate#,'yyyy-mm-dd hh24:mi:ss')
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="wxfakeid">
+				(r.fakeid = #wxfakeid# or s.fakeid= #wxfakeid#)
+            </isNotEmpty>
+            order by m.messageid desc
+    </select>
+    <select id="loadmessagelogbyid" resultClass="hashmap" parameterClass="hashmap">
+         select messageid , xml , issend from messagelog where 1=1
+         <isNotEmpty prepend="and" property="messageid">
+				messageid =#messageid#
+            </isNotEmpty>
+    </select>
+    
+    
+    <!-- 活跃用户数 -->
+    <select id="loadactiveusercount" resultClass="int" parameterClass="hashmap">
+         select count(*) count from (select sender from MESSAGELOG m 
+			where 1=1 and m.issend='0'
+            <isNotEmpty prepend="and" property="startdate">
+				m.datetime >=to_date(#startdate#,'yyyy-mm-dd hh24:mi:ss')
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="enddate">
+				m.datetime &lt;= to_date(#enddate#,'yyyy-mm-dd hh24:mi:ss')
+            </isNotEmpty>
+            group by sender )
+    </select>
+    <!-- 查询总共有多少用户 -->
+    <select id="loadwxusercount" resultClass="int" parameterClass="hashmap">
+         select count(*) count from wxuserinfo
+    </select>
+    
+    <select id="loaduserlistforreport" resultClass="hashmap" parameterClass="java.lang.String">
+         select fakeid,nickname,wxid,openid,userstatus,email from wxuserinfo where 1=1 
+			<isNotEmpty prepend="and" property="value">
+				openid = #value#
+            </isNotEmpty>
+            order by createdate
+    </select>
+    <!-- 发送请求数统计 -->
+    <select id="loaduserrequestcount" resultClass="hashmap" parameterClass="hashmap">
+         select wxu.WXID,wxu.FAKEID,wxu.NICKNAME,t.messagecount from WXUSERINFO wxu left join (
+			select m.SENDER openid,count(m.SENDER) messagecount from MESSAGELOG m where m.issend='0'
+			<isNotEmpty prepend="and" property="startdate">
+				m.datetime >=to_date(#startdate#,'yyyy-mm-dd hh24:mi:ss')
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="enddate">
+				m.datetime &lt;= to_date(#enddate#,'yyyy-mm-dd hh24:mi:ss')
+            </isNotEmpty>
+			group by m.SENDER) t
+			on t.OPENID=wxu.OPENID 
+			where 1=1
+            <isNotEmpty prepend="and" property="wxfakeid">
+				wxu.fakeid=#wxfakeid#
+            </isNotEmpty>
+           	order by t.messagecount 
+    </select>
+    <!-- 按时段统计 -->
+    <select id="loadmessagecountbyhours" resultClass="hashmap" parameterClass="hashmap">
+         select TO_CHAR(m.DATETIME,'yyyy-mm-dd hh24') messagedate , count(*) messagecount from MESSAGELOG m 
+         where m.issend='0'
+			<isNotEmpty prepend="and" property="startdate">
+				m.datetime >=to_date(#startdate#,'yyyy-mm-dd hh24:mi:ss')
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="enddate">
+				m.datetime &lt;= to_date(#enddate#,'yyyy-mm-dd hh24:mi:ss')
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="wxfakeid">
+				m.fakeid=#wxfakeid#
+            </isNotEmpty>
+			GROUP BY TO_CHAR(m.DATETIME,'yyyy-mm-dd hh24')
+			ORDER BY TO_CHAR(m.DATETIME,'yyyy-mm-dd hh24')
+    </select>
+    <!-- 按消息类型统计 -->
+    <select id="loadmessagebytype" resultClass="hashmap" parameterClass="hashmap">
+         select m.MSGTYPE,m.msgresult, m.issend,count(*) messagecount from MESSAGELOG m where 1=1 
+			<isNotEmpty prepend="and" property="startdate">
+				m.datetime >=to_date(#startdate#,'yyyy-mm-dd hh24:mi:ss')
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="enddate">
+				m.datetime &lt;= to_date(#enddate#,'yyyy-mm-dd hh24:mi:ss')
+            </isNotEmpty>
+			GROUP BY m.MSGTYPE,m.ISSEND,m.msgresult
+    </select>
+    <!-- 报表结束  -->
+    
+    <!-- WXFile操作 -->
+    
+    <select id="findwxuploadfilecount" parameterClass="hashmap" resultClass="int">
+		select count(*) from WXUploadFile lf 
+         where 1=1 
+         	<isNotEmpty prepend="and" property="sys_code">
+				lf.sys_code = #sys_code#
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="fileName">
+				lf.fileName like #fileName#
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="fileType">
+				lf.fileType = #fileType#
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="startDate">
+				lf.createDate >= to_date(#startDate#,'yyyy-mm-dd hh24:mi:ss')
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="endDate">
+				lf.createDate &lt;= to_date(#endDate#,'yyyy-mm-dd hh24:mi:ss')
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="wxFileId">
+				lf.wxFileId = #wxFileId#
+            </isNotEmpty>
+            order by lf.createDate desc
+	</select>
+    
+    <select id="loadwxuploadfile" parameterClass="hashmap" resultClass="com.efreight.SQL.WXUploadFile">
+		select lf.sys_code , lf.fileName , lf.fileType , lf.wxFileId , lf.filePath , lf.fileUrl , to_char(lf.createDate,'yyyy-mm-dd hh24:mi:ss') as createDate from 
+			(select row_.*, rownum rownum_ from
+				(select ry.* from WXUploadFile ry where 1=1
+					<isNotEmpty prepend="and" property="sys_code">
+						ry.sys_code = #sys_code#
+		            </isNotEmpty>
+		            <isNotEmpty prepend="and" property="fileName">
+						ry.fileName like #fileName#
+		            </isNotEmpty>
+		            <isNotEmpty prepend="and" property="fileType">
+						ry.fileType = #fileType#
+		            </isNotEmpty>
+		            <isNotEmpty prepend="and" property="startDate">
+						ry.createDate >= to_date(#startDate#,'yyyy-mm-dd hh24:mi:ss')
+		            </isNotEmpty>
+		            <isNotEmpty prepend="and" property="endDate">
+						ry.createDate &lt;= to_date(#endDate#,'yyyy-mm-dd hh24:mi:ss')
+		            </isNotEmpty>
+		            <isNotEmpty prepend="and" property="wxFileId">
+						ry.wxFileId = #wxFileId#
+		            </isNotEmpty>
+		            	order by ry.createDate desc) row_
+		           where  1=1
+		           <isNotEmpty prepend="and" property="pageSize">
+						rownum &lt;=#pageSize#
+		           </isNotEmpty>
+		           )lf where 1=1
+		           <isNotEmpty prepend="and" property="pageIndex">
+						rownum_ >#pageIndex#
+		           </isNotEmpty>
+		order by lf.createDate desc
+	</select>
+    
+    <insert id="insertwxuploadfile" parameterClass="hashmap">
+    	<selectKey resultClass="int" type="pre" keyProperty="sys_code" >
+         SELECT SEQ_WXUPLOADFILE.nextval AS sys_code FROM dual
+     	</selectKey>
+		insert into WXUploadFile (sys_code,fileName,fileType,filePath,fileUrl,createDate) 
+		values 
+		(#sys_code#,#fileName#,#fileType#,#filePath#,#fileUrl#,to_date(#createDate#,'yyyy-mm-dd hh24:mi:ss'))
+	</insert> 
+	
+	<update id="updatewxuploadfile" parameterClass="hashmap">
+		update WXUploadFile
+		<dynamic prepend="set">
+			<isNotEmpty prepend="," property="wxFileId"><![CDATA[ wxFileId = #wxFileId#]]></isNotEmpty>
+		</dynamic>
+		where sys_code=#sys_code#
+	</update>
+	<update id="updatewxuseremail" parameterClass="hashmap">
+		UPDATE WXUSERINFO SET EMAIL=#email# WHERE OPENID=#openid#
+	</update>
+	<!-- 获取某一时间段内所有发送失败的信息 -->
+	<select id="getfailureMessages" resultClass="hashmap" parameterClass="java.lang.String">
+	select messageid,datetime,receiver,xml,success,wxmsgid,msgtype,issend,MSGRESULT from messagelog where success='false' and msgtype&lt;&gt;'WATCHDOG' and datetime&gt;=to_date(#value#,'yyyy-mm-dd hh24:mi:ss')
+	</select>
+	<select id="getawbqueryexception" resultClass="hashmap" parameterClass="java.lang.Integer">
+		select messageid,TO_CHAR (DATETIME,'yyyy-mm-dd hh24:mi:ss') AS DATETIME,receiver,content from messagelog where messageid&gt;#value# and datetime&gt;to_date('2013-08-05 00:00:00','yyyy-mm-dd hh24:mi:ss') and (content like '%最新轨迹出现异常情况%' or content like '%暂无轨迹%') 
+	</select>
+	<update id="resendsuccess" parameterClass="java.lang.Integer">
+		update messagelog set success='true' where messageid=#value#
+	</update>
+	<select id="GetNoResponseMessages" resultClass="hashmap" parameterClass="hashmap">
+		SELECT
+			MESSAGEID,
+			TO_CHAR (
+				DATETIME,
+				'yyyy-mm-dd hh24:mi:ss'
+			) AS DATETIME,
+			SENDER,
+			WXMSGID,
+			CONTENT
+		FROM
+			MESSAGELOG
+		WHERE
+			(
+				MSGTYPE = 'AWBTRACE'
+				OR MSGTYPE = 'TACT'
+			)
+		AND DATETIME &gt; TO_DATE (#YESTODAY#, 'yyyy-mm-dd hh24:mi:ss')
+		AND DATETIME &lt; TO_DATE (
+			#DATETIME#,
+			'yyyy-mm-dd hh24:mi:ss'
+		)
+		AND ISSEND = '0'
+		AND MESSAGEID &gt; #MESSAGEID#
+		AND WXMSGID IN (
+			SELECT
+				WXMSGID
+			FROM
+				MESSAGELOG
+			WHERE
+				DATETIME &gt; TO_DATE (#YESTODAY#, 'yyyy-mm-dd hh24:mi:ss')
+			AND WXMSGID IS NOT NULL
+			AND WXMSGID &lt;&gt; 'null'
+			GROUP BY
+				WXMSGID
+			HAVING
+				COUNT (WXMSGID) = 1
+		)
+		ORDER BY
+			MESSAGEID ASC
+</select>
+<!-- 查询城市坐标 -->
+	<select id="findcitycoordinatesbycityname" parameterClass="java.lang.String" resultClass="hashmap">
+		select cityname,province,country,x,y from citycoordinates where cityname=#cityname#
+	</select>
+<!-- 此处可有多个SQLID-->
+
+<!-- 用户操作历史 -->
+	<insert id="insertuserawbhis" parameterClass="hashmap">
+		insert into USERAWBHIS (id,userid,createtime,awbtracenum,isdel,source) values (seq_userawbhis.nextval,#userid#,to_date(#createtime#,'yyyy-mm-dd hh24:mi:ss'),#awbtracenum#,#isdel#,#source#)
+	</insert>
+	<select id="getuserawbhis" parameterClass="String" resultClass="com.efreight.model.UserAWBHis">
+		select * from USERAWBHIS where id in(select max(t.id) as createtime from USERAWBHIS t where t.userid=#userid# group by t.AWBTRACENUM)  and ISDEL='1'  order by createtime desc
+	</select>
+	
+	<insert id="insertuserawbhistory" parameterClass="hashmap">
+		insert into USERAWBHISTORY (id,receiver,username,mawbcode,histype,pushdayofweek,pushtimefrom,pushtimeto,datasource,createdate,subtype) 
+		values 
+		(seq_userawbhis.nextval,#receiver#,#username#,#mawbcode#,#histype#,#pushdayofweek#,#pushtimefrom#,#pushtimeto#,#datasource#,to_date(#createdate#,'yyyy-mm-dd hh24:mi:ss'),#subtype#)
+	</insert>
+	<select id="getuserawbhistory" parameterClass="hashmap" resultClass="hashmap">
+		select * from USERAWBHISTORY where receiver=#receiver# 
+		<isNotEmpty prepend="and" property="mawbcode">
+				mawbcode = #mawbcode#
+        </isNotEmpty>
+        and histype='SUB'
+        order by id desc
+	</select>
+	<update id="updateuserawbhistory" parameterClass="hashmap">
+		update USERAWBHISTORY set histype="UNSUB" where receiver=#receiver# and subtype=#subtype# and mawbcode=#mawbcode#
+	</update>
+	<update id="updatepushinfo" parameterClass="hashmap">
+		update userawbhistory set pushdayofweek=#pushdayofweek#,pushtimefrom=#pushtimefrom#,pushtimeto=#pushtimeto#,histype=#histype# where receiver=#receiver# and mawbcode=#mawbcode#
+	</update>
+	
+	<select id="getavliablepushinfo" parameterClass="java.lang.String" resultClass="hashmap">
+		select * from pushqueue where pushdate &lt;= to_date(#value#,'yyyy-mm-dd hh24:mi:ss') and issend='false' and rownum&lt;10
+	</select>
+	<update id="setpushdone" parameterClass="java.lang.Integer">
+		update pushqueue set issend='true' where id=#value#
+	</update>
+</sqlMap>
