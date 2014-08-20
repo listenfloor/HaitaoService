@@ -1,0 +1,14 @@
+#production
+tact-BJS=10003009
+tact-SHA=10003010
+tact-CAN=10003011
+tact-CTU=10003012
+
+#test
+#tact-DEFAULT=10000025
+#tact-PEK=10000025
+#tact-SHA=10000026
+#tact-CAN=10003011
+#tact-CTU=10003012
+
+

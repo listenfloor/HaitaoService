@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="Qrcode">	
+	<insert id="insertnewcode" parameterClass="hashmap">
+		insert into qrcode (CODE,REMARK,DATETIME,QRCODEKEY) values (#code#,#remark#,#datetime#,#qrcodekey#)
+	</insert>
+	<select id="getnextcode" resultClass="java.lang.Integer">
+		select max(code)+1 as code from qrcode
+	</select>
+	<select id="getqrcodeinfo" resultClass="java.util.Map">
+		select * from qrcode where code = #value#
+	</select>
+	
+	<select id="getmarketingqrcodeticket" resultClass="java.lang.String">
+		select QRCODETICKET from MARKETINGQRCODEINFO where openid=#value#
+	</select>
+	<select id="getmarketingqrcodeopenid" resultClass="java.lang.String">
+		select openid from MARKETINGQRCODEINFO where QRCODETICKET=#value#
+	</select>
+	<insert id="createmarketingqrcodeinfo" parameterClass="java.util.Map">
+		insert into MARKETINGQRCODEINFO (QRCODETICKET,OPENID,DATETIME) values (#ticket#,#openid#,#datetime#)
+	</insert>
+	
+	<insert id="insertscaninfo" parameterClass="java.util.Map">
+		insert into scaninfo values (#openid#,#qrcodekey#,#datetime#)
+	</insert>
+	
+	<select id="getwxloginauth" parameterClass="java.lang.String" resultClass="hashmap">
+		select APPID,APPKEY,USERNAME,DEFAULTCALLBACKURL,DESCRIPTION from wxloginauth where appid=#value#
+	</select>
+</sqlMap>
